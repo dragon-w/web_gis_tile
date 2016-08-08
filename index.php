@@ -7,8 +7,7 @@
  */
 include 'worker.php';
 set_time_limit(0);
-
-define('DEFAULT_LEVEL',4);
+define('DEFAULT_LEVEL',5);
 
 /*
  * 1.读取源图,计算出原图的缩放等级:$level=>ceil(高度/256),
@@ -18,8 +17,9 @@ define('DEFAULT_LEVEL',4);
  */
 
 
+
 //1
-$source_path="./ditie.png";
+$source_path="./gis.png";
 
 if(!file_exists($source_path)){
 
@@ -30,7 +30,7 @@ $source_info   = getimagesize($source_path);
 
 $source_width  = $source_info[0];
 $source_height = $source_info[1];
-$source_ratio  = $source_height/$source_width; //
+$source_ratio  = $source_height/$source_width; //高宽比
 
 
 //临时图层目录处理
@@ -51,7 +51,7 @@ if(!file_exists($root)){
                 continue;
             }
 
-            $item=rtrim($path,"/")."/".$item;
+            $item=rtrim($root,"/")."/".$item;
 
             if(is_dir($item)){
                 continue;
@@ -63,32 +63,51 @@ if(!file_exists($root)){
 
 
 //对原图进行缩放处理
-$level=5;
-
-for($i=0;$i<$level;$i++){
+for($i=0;$i<DEFAULT_LEVEL;$i++){
 
     $target_path=$root.$i.'.png';
 
     if($i==0){
 
-        $target_width=256;
+        if($source_ratio>1){
+            $target_height=256;
+        }else{
+            $target_width=256;
+        }
 
     }elseif($i==1){
 
-        $target_width=512;
+        if($source_ratio>1){
+            $target_height=512;
+        }else{
+            $target_width=512;
+        }
+
 
     }else{
 
         $l=pow(2,$i);
 
-        $target_width=256*$l;
+        if($source_ratio>1){
+            $target_height=256*$l;
+        }else{
+            $target_width=256*$l;
+        }
+
     }
 
-    $target_height=$source_height*$target_width/$source_width;
 
-    resize('./',$root,'ditie.png',$i.'.png',$target_width,$target_height);
+    if($source_ratio>1){
+
+        $target_width=$source_width*$target_height/$source_height;
+
+    }else{
+
+        $target_height=$source_height*$target_width/$source_width;
+    }
+
+    resize('./',$root,'gis.png',$i.'.png',$target_width,$target_height);
 }
-
 
 
 $tmp=array();
@@ -96,7 +115,7 @@ $tmp=array();
 $work_tile_map=array();
 
 //生成层级切图任务列表
-for($z=0;$z<$level;$z++){
+for($z=0;$z<DEFAULT_LEVEL;$z++){
 
     $source_path=$root.$z.'.png';
 
@@ -105,6 +124,7 @@ for($z=0;$z<$level;$z++){
         'sourse_path'=>$source_path
     );
 }
+
 
 //循环切图
 foreach($work_tile_map as $val){

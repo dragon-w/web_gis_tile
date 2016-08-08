@@ -24,7 +24,6 @@ function get_rows($level){
 //切图函数
 function create_tile($source_path,$z){
 
-
     if(!file_exists($source_path)){
 
         exit($source_path.'文件不存在');
@@ -45,11 +44,6 @@ function create_tile($source_path,$z){
 
     $level=ceil($source_height/256);
 
-
-    if($level>10){
-
-        exit('原文件分辨率过大,建议使用2560*1600以下的图片');
-    }
 
     $rows=get_rows($z+1); //层级比行标号大1
 
@@ -121,6 +115,8 @@ function resize($dir, $newdir, $img, $newimg, $max_w, $max_h, $th_x = '', $th_y 
 
     // get original images width and height
     list($or_w, $or_h, $or_t) = getimagesize($dir.$img);
+
+
 
     switch($or_t){
 
