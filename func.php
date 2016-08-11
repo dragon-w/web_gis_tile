@@ -156,6 +156,12 @@ function resize($dir, $newdir, $img, $newimg, $max_w, $max_h, $th_x = '', $th_y 
 
         // copy old image to new image
         $rs_image = imagecreatetruecolor($rs_w, $rs_h);
+
+
+        imagesavealpha($rs_image, true);
+        $trans_colour = imagecolorallocatealpha($rs_image, 0, 0, 0, 127);
+        imagefill($rs_image, 0, 0, $trans_colour);
+
         imagecopyresampled($rs_image, $or_image, 0, 0, 0, 0, $rs_w, $rs_h, $or_w, $or_h);
 
     } else { // image requires no resizing
